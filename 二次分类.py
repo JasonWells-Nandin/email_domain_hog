@@ -88,7 +88,7 @@ def read_and_analyze_json(file_path, api_key):
 # 主函数
 def main():
     file_path = input("请输入JSON文件路径: ")
-    api_key = "79aa174c91414565815b2b3ba22a41c8"  # 替换为您的ipgeolocation API密钥
+    api_key = "**********"  # 替换为您的ipgeolocation API密钥
     read_and_analyze_json(file_path, api_key)
 
 if __name__ == "__main__":
