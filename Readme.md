@@ -1,7 +1,7 @@
-# 分类助手
+# email_domain_hog
 
-​	设计思路为一下大纲
+​	The logic diagram of the program design is as follows 
 
 ![](逻辑图.png)
 
-​	现目前实现数据传入分类模块进行分类标记，再将输出传出为JSON数据，然后再利用二次分类脚本进行二次分类。会逐渐优化为一个脚本并且实现端口的查询。
+​	Currently, the data is passed into the classification module for classification and labeling, and then the output is passed out as JSON data, and then the secondary classification script is used for secondary classification. It will be gradually optimized into a script and implement the port query.
