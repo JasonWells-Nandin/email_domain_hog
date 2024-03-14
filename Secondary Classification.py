@@ -1,7 +1,7 @@
 import json
-import requests
 import csv
 import os
+from ip_geolocation_api import IPGeolocationAPI
 
 # Load Disposable Mailing Domain List
 def load_disposable_email_domains():
@@ -23,22 +23,16 @@ def load_free_email_domains():
             free_domains.add(row[0].strip())
     return free_domains
 
-# Functions to recognize IP types
-def identify_ip(ip):
-    if ip.startswith("192.168.") or ip.startswith("10.") or ip.startswith("172.16."):
-        return "Extranet IP"
-    elif ip.startswith("127."):
-        return "loopback IP"
-    else:
-        return "Intranet IP"
+# Function to recognize IP types
+def is_private_ip(ip):
+    return ipaddress.ip_address(ip).is_private
 
 # Analyze the geographic location and carrier information of the extranet IPs
 def analyze_ip(ip, api_key):
-    url = f"https://api.ipgeolocation.io/ipgeo?apiKey={api_key}&ip={ip}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-            return {"Location": data["country_name"], "operator": data["isp"]}
+    api = IPGeolocationAPI(api_key)
+    ip_info = api.get_bulk_ip_geolocation([ip])
+    if ip_info and ip_info[ip]:
+        return {"Location": ip_info[ip]['country_name'], "operator": ip_info[ip]['isp']}
     else:
         return {}
 
@@ -50,7 +44,7 @@ def check_email_type(email, disposable_domains, free_domains):
     elif domain in free_domains:
         return "Free Email"
     else:
-        return "unknow"
+        return "unknown"
 
 # Analyze whether the free email is a company email or webmail
 def analyze_free_email(email):
@@ -73,12 +67,12 @@ def read_and_analyze_json(file_path, api_key):
             print("input data:", input_data)
             print("data type:", data_type)
             if data_type == "IP address":
-                ip_type = identify_ip(input_data)
+                ip_type = is_private_ip(input_data)
                 print("IP address:", ip_type)
                 if ip_type == "Extranet IP":
                     ip_info = analyze_ip(input_data, api_key)
-                    print("country_name:", ip_info.get("country_name", "unknow"))
-                    print("operator:", ip_info.get("operator", "unknow"))
+                    print("country_name:", ip_info.get("country_name", "unknown"))
+                    print("operator:", ip_info.get("operator", "unknown"))
             elif data_type == "e-mail":
                 print("email-type:", check_email_type(input_data, disposable_domains, free_domains))
                 if check_email_type(input_data, disposable_domains, free_domains) == "Free Email":
@@ -88,7 +82,7 @@ def read_and_analyze_json(file_path, api_key):
 # main function
 def main():
     file_path = input("Please enter the path to the JSON file: ")
-    api_key = "**********"  # Replace with your ipgeolocation API key
+    api_key = "your_api_key_here"  # Replace with your ipgeolocation API key
     read_and_analyze_json(file_path, api_key)
 
 if __name__ == "__main__":
